@@ -20,7 +20,7 @@ def read_data(file_name):
     dict_constants={}
 
     #read txt file on absolute path
-    with open(f"/home/sebastian/Documents/EXETER/Nature_inspired_computation/pyprojects/Coursework2/gecco19-thief-master/src/main/resources/{file_name}") as raw:
+    with open(f"./{file_name}") as raw:
         data = raw.read()
         nodes_pos=data.split('ITEMS SECTION')[0]
         items_vals = data.split('ITEMS SECTION')[1]

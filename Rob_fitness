@@ -1,0 +1,6 @@
+#fitness function(TSP, Knapsack)
+def fitness_function(time,value):
+    #f = time - value
+    f = total_time - profit
+    #return f
+    return f

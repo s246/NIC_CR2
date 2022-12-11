@@ -1,0 +1,70 @@
+#hypervolume
+def dominate(point1,point2):
+    if point1[0]<point2[0] and point1[1]>point2[1]:
+        return True
+    elif point1[0]<point2[0] and point1[1]==point2[1]:
+        return True
+    elif point1[0]==point2[0] and point1[1]>point2[1]:
+        return True
+    else:
+        return False
+
+
+#takes the file_name, and an array of tuples containing Time and Value of all final solutions  
+def Hypervolume(file_name,TTP_results):
+    if file_name == 'a280-n279.txt':
+        ideal = [2613,42036]
+        nadir = [5444,0]
+    elif file_name == 'a280_n1395.txt':
+        ideal = [2613,489194]
+        nadir = [6573,0]
+    elif file_name == 'a280_n2790.txt':
+        ideal = [2613,1375443]
+        nadir = [6646,0]
+    elif file_name == 'fnl4461_n4460.txt':
+        ideal = [185359,645150]
+        nadir = [442464,0]
+    elif file_name == 'fnl4461_n22300.txt':
+        ideal = [185359,7827881]
+        nadir = [452454,0]
+    elif file_name == 'fnl4461_n44600.txt':
+        ideal == [185359,22136989]
+        nadir = [459901,0]
+    elif file_name == 'pla33810_n33809.txt':
+        ideal = [66048945,4860715]
+        nadir = [168432301,0]
+    elif file_name == 'pla33810_n169045.txt':
+        ideal = [66048945,59472432]
+        nadir = [169415148,0]
+    elif file_name == 'pla33810_n338090.txt':
+        ideal = [66048945,168033267]
+        nadir = [168699977,0]
+
+    area = ideal[1]*(nadir[0]-ideal[0])
+
+    #get non-dominated set
+    non_dominated_set = []
+    for i in range(len(TTP_results)):
+        dominated = False
+        for j in range(len(TTP_results)):
+            if dominated == False:
+                dominated = dominate(TTP_result[j],TTP_result[i])
+        if dominated == False:
+            non_dominated_set.append(TTP_result[i])
+    
+    def sort_key(item):
+        return item[0]
+    non_dominated_set.sort(key=sort_key)
+
+    set_area = 0
+    for i in range(len(non_dominated_set)):
+        if i == 0:
+            #from value to nadir
+            set_area += non_dominated_set[i][1]*(nadir[0]-non_dominated_set[i][0])
+        else:
+            #from value to [nadir x, previous y]
+            set_area += (non_dominated_set[i][1]-non_dominated_set[i-1][1])*(nadir[0]-non_dominated_set[i][0])
+
+    for i in range(len(non_dominated_set)):
+        non_dominated_set[i][1] = non_dominated_set[i][1]*-1
+    return set_area, non_dominated_set

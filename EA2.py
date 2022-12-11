@@ -7,7 +7,7 @@ import math
 import random
 
 
-file_name='a280-n279.txt'
+file_name='a280-n1395.txt'
 
 #global vars
 #constanst of current problem
@@ -29,7 +29,7 @@ global detailed_fitnesess
 global number_fitness_eval
 
 
-pop_size=200
+pop_size=20
 tournament_size=4
 mutation_rate=2
 SEED=4
@@ -98,10 +98,10 @@ def generate_random_initial_population_knappsack(pop_size,dimension):
 
     #use numpy random int between 0-1 to create solutions with size of number of bags [0,1,0,0,1.....] to 100
     for i in range(0, pop_size):
-        #actual_sol = np.random.randint(2, size=int(dimension))
         actual_sol=np.array([int(t) for t in np.zeros(dimension)])
-        # while (np.count_nonzero(actual_sol)>0):
-        #     actual_sol = np.random.randint(2, size=int(dimension))
+        # indx=np.random.choice(range(0, len(actual_sol)), 15, replace=False)
+        # for i in indx:
+        #     actual_sol[i]=1
         population.append(actual_sol)
 
     return population
@@ -257,6 +257,72 @@ def perform_tournament_selection(tournament_size, population, fitnesses):
     return candidates[winner_index]
 
 
+def crossover_knapsack(parents, skip_crossover=False):
+    crossover_point = np.random.randint(0, high=len(parents[0]), dtype=int)
+    offsprings = parents.copy()
+    # print('crossover_point knapsack', crossover_point)
+
+    # Case for no crossover
+    if skip_crossover == True:
+        return offsprings
+
+    offsprings[0, crossover_point:] = parents[1, crossover_point:]
+    offsprings[1, crossover_point:] = parents[0, crossover_point:]
+
+    return offsprings.tolist()
+
+
+def crossover_tsp(parents, skip_crossover=False):
+    crossover_point = np.random.randint(1, high=len(parents[0]), dtype=int)
+    # print('crossover_point tsp', crossover_point)
+
+    offsprings = []
+    offspring_1 = []
+    offspring_2 = []
+
+    for i in range(crossover_point):
+        offspring_1.append(parents[0][i])
+        offspring_2.append(parents[1][i])
+
+    for i in range(len(parents[0])):
+        if parents[1][i] not in offspring_1:
+            offspring_1.append(parents[1][i])
+
+        if parents[0][i] not in offspring_2:
+            offspring_2.append(parents[0][i])
+
+    offsprings.append(offspring_1)
+    offsprings.append(offspring_2)
+
+    return offsprings
+
+
+def crossover(parent1, parent2):
+    parents = []
+    parents.append(parent1)
+    parents.append(parent2)
+
+    offsprings = parents.copy()
+
+    # crossover knapsack
+    parents_knapsack = []
+    parents_knapsack.append(parents[0][0])
+    parents_knapsack.append(parents[1][0])
+    parents_knapsack_arr = np.array(parents_knapsack)
+    offsprings_knapsack = crossover_knapsack(parents_knapsack_arr)
+
+    # crossover TSP
+    parents_tsp = []
+    parents_tsp.append(parents[0][1])
+    parents_tsp.append(parents[1][1])
+    offsprings_tsp = crossover_tsp(parents_tsp)
+
+    # offspring 1
+    offsprings[0] = (offsprings_knapsack[0], offsprings_tsp[0])
+    # offspring 2
+    offsprings[1] = (offsprings_knapsack[1], offsprings_tsp[1])
+
+    return offsprings[0], offsprings[1]
 def mutation(child1, child2, rate):
     a1, a2 = child1, child2
     bag_dis_1, city_route_1, bag_dis_2, city_route_2 = a1[0].copy(), a1[1].copy(), a2[0].copy(), a2[1].copy()
@@ -367,6 +433,7 @@ def main():
 
     #SET SEED FOR REPLICATION PURPOSES
     np.random.seed(SEED)
+    random.seed(SEED)
 
     #read bag data from file #detailed comments on function
     read_data(file_name)
@@ -402,14 +469,12 @@ def main():
         #select parent b from tournament
         parent_b = perform_tournament_selection(tournament_size, population, fitnesess)
 
-        #generate random locus to cross parents
-        #locus = np.random.choice(len(parent_a), 1)[0]
 
-        # #perform crossover on that locus
-        # child_c, child_d = perform_crossover(parent_a, parent_b, locus)
+        # perform crossover on a locus
+        child_c, child_d = crossover(parent_a, parent_b)
 
 
-        child_e, child_f = mutation(parent_a, parent_b, mutation_rate)
+        child_e, child_f = mutation(child_c, child_d, mutation_rate)
         # Evaluate child 1 fitness
         child_e_fitness, child_e_time,child_e_profit = fitness_function(child_e)
 

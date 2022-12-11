@@ -67,4 +67,5 @@ def Hypervolume(file_name,TTP_results):
 
     for i in range(len(non_dominated_set)):
         non_dominated_set[i][1] = non_dominated_set[i][1]*-1
-    return set_area, non_dominated_set
+    hv = set_area/area
+    return hv, non_dominated_set

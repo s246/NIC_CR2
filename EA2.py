@@ -3,19 +3,30 @@
 import re
 import numpy as np
 import pandas as pd
+import random
+
 
 file_name='a280-n279.txt'
-
-
 
 #global vars
 global dict_constants #constanst of current problem
 global nodes_df
 global items_df
+global initial_pop
+
+
+global number_of_nodes
+global number_of_items
+global max_nodes
+
+
+pop_size=20
+
+
 
 
 def read_data(file_name):
-    global dict_constants, nodes_df, items_df
+    global dict_constants, nodes_df, items_df, number_of_nodes, number_of_items, max_nodes
 
     dict_constants={}
 
@@ -57,6 +68,11 @@ def read_data(file_name):
     #close file
     raw.close()
 
+    number_of_nodes=int(dict_constants['DIMENSION'])
+    number_of_items = int(dict_constants['NUMBER OF ITEMS'])
+    max_nodes = int(dict_constants['DIMENSION'])
+
+
 def generate_random_initial_population_knappsack(pop_size,dimension):
     global number_fitness_eval #set global var
 
@@ -73,6 +89,28 @@ def generate_random_initial_population_knappsack(pop_size,dimension):
 
     return population
 
+def generate_random_initial_population_TSP(pop_size,number_nodes, max_nodes):
+
+    population = []
+    #use numpy random solutions with size of number of nodes [1,2,3,280.....] to number of nodes
+    for i in range(0, pop_size):
+        actual_sol = np.random.choice(range(2,int(number_nodes)+1), int(max_nodes-1), replace=False)
+        actual_sol=np.insert(actual_sol, 0, 1)
+        population.append(actual_sol)
+
+    return population
+
+def create_final_pop():
+    global initial_pop, dict_constants, number_of_nodes, number_of_items
+    final_pop=[]
+    initial_KN=generate_random_initial_population_knappsack(pop_size,number_of_items)
+    initial_TSP=generate_random_initial_population_TSP(pop_size,number_of_nodes,max_nodes)
+
+    for i in range(len(initial_KN)):
+        final_pop.append((initial_KN[i],initial_TSP[i]))
+
+    initial_pop=final_pop
 
 
 read_data(file_name)
+create_final_pop()

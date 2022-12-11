@@ -1,13 +1,3 @@
-#travelling Thief
-
-#takes: Tuple(TSP order, Knapsack selection)
-#returns: total time on TSP to collect knapsack items
-
-#knapsack value -> has been integrated into Travelling Thief
-#takes: knapsack selection
-#returns: value of items in knapsack
-from euclidean_distance import e_distance
-
 #Traveling Thief(TSP,Knapsack)
 def travelling_thief(check):
     TSP = check[0]
@@ -18,8 +8,6 @@ def travelling_thief(check):
     knapsack = check[1]
 
     bag_locations = [[]]
-    from file_read import read_data
-    dict_constants, nodes_df, items_df = read_data('a280-n279.txt')
 
     for i in range (int(dict_constants['DIMENSION'])):
         bag_locations.append([])
@@ -92,4 +80,3 @@ def fitness_function(to_check):
     #f = time - value
     f = total_time - profit
     #return f
-    return f

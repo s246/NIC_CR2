@@ -31,7 +31,7 @@ global number_fitness_eval
 
 pop_size=200
 tournament_size=4
-mutation_rate=10
+mutation_rate=2
 SEED=4
 
 
@@ -98,7 +98,10 @@ def generate_random_initial_population_knappsack(pop_size,dimension):
 
     #use numpy random int between 0-1 to create solutions with size of number of bags [0,1,0,0,1.....] to 100
     for i in range(0, pop_size):
-        actual_sol = np.random.randint(2, size=int(dimension))
+        #actual_sol = np.random.randint(2, size=int(dimension))
+        actual_sol=np.array([int(t) for t in np.zeros(dimension)])
+        # while (np.count_nonzero(actual_sol)>0):
+        #     actual_sol = np.random.randint(2, size=int(dimension))
         population.append(actual_sol)
 
     return population
@@ -458,7 +461,7 @@ def main():
 
 
     print('HYPER VOLUME')
-    Hypervolume(file_name,[[t[0],t[1]] for t in detailed_fitnesess])
+    print(Hypervolume(file_name,[[t[0],t[1]] for t in detailed_fitnesess]))
     print('***********************')
 
     #return w,v,fitnesses[best_sol_index],np.average(fitnesses),list(s.keys())

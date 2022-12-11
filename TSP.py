@@ -1,12 +1,8 @@
-# Python3 program for the above approach
-
 from typing import DefaultDict
 
 
 INT_MAX = 2147483647
 
-# Function to find the minimum
-# cost path for all the paths
 def findMinRoute(tsp):
 	sum = 0
 	counter = 0
@@ -63,8 +59,9 @@ def findMinRoute(tsp):
 	# Started from the node where
 	# we finished as well.
 	print("Minimum Cost is :", sum)
-	print(visitedRouteList)
 	print(route)
+
+	return sum
 
 
 # Driver Code
@@ -72,6 +69,10 @@ if __name__ == "__main__":
 
 	# Input Matrix
 	tsp = [[-1, 10, 15, 20], [10, -1, 35, 25], [15, 35, -1, 30], [20, 25, 30, -1]]
-
+	tsp2 = [[0.0, 266.03, 252.99, 269.32, 133.51],
+			[266.03, 0.0, 56.14, 8.0, 168.58],
+			[252.99, 56.14, 0.0, 64.12, 135.48],
+			[269.32, 8.0, 64.12, 0.0, 174.64],
+			[133.51, 168.58, 135.48, 174.64, 0.0]]
 	# Function Call
-	findMinRoute(tsp)
+	findMinRoute(tsp2)

@@ -1,9 +1,10 @@
 
 #Libraries
-import re
+#import FITNESS2
 import numpy as np
 import pandas as pd
-import random
+import math
+import itertools
 
 
 file_name='a280-n279.txt'
@@ -18,9 +19,11 @@ global initial_pop
 global number_of_nodes
 global number_of_items
 global max_nodes
+global fitnesess
+global detailed_fitnesess
 
 
-pop_size=20
+pop_size=200
 
 
 
@@ -31,7 +34,7 @@ def read_data(file_name):
     dict_constants={}
 
     #read txt file on absolute path
-    with open(f"./{file_name}") as raw:
+    with open(f"/home/sebastian/Documents/EXETER/Nature_inspired_computation/pyprojects/Coursework2/gecco19-thief-master/src/main/resources/{file_name}") as raw:
         data = raw.read()
         nodes_pos=data.split('ITEMS SECTION')[0]
         items_vals = data.split('ITEMS SECTION')[1]
@@ -111,6 +114,194 @@ def create_final_pop():
 
     initial_pop=final_pop
 
+    def e_distance(point_1, point_2):
+        distance = math.sqrt((point_2[1] - point_1[1]) ** 2 + (point_2[2] - point_1[2]) ** 2)
+        return distance
+
+    def travelling_thief(check):
+        TSP = check[1]
+        # it is assumed TSP begins at node 1
+        # if not, please contact the person who provided the TSP!
+        # TSP = [1,x,y,...,a,b]
+        # len(TSP) = len(nodes_df)
+        knapsack = check[0]
+
+        bag_locations = [[]]
+
+        for i in range(int(dict_constants['DIMENSION'])):
+            bag_locations.append([])
+        # look through all bags
+        for i in range(len(items_df)):
+            # assign to position in array which node they are at
+            bag_locations[items_df['assigned_node'][i]].append(i)
+        # this will give a 2D array with an empty 1 index (node 1 has no items)
+        # also an empty 0 index (node 0 does not exist)
+
+        bag_weight = 0
+        total_value = 0
+        time = 0
+        # for len(TSP solution)
+        for i in range(len(TSP)):
+            # if current node is not last in TSP solution
+            if i < (len(TSP) - 1):
+                # find distance from node just visited to new node
+                j = TSP[i] - 1
+                point1 = [TSP[i], nodes_df['x_coor'][j], nodes_df['y_coor'][j]]
+                k = TSP[(i + 1)] - 1
+                point2 = [TSP[k], nodes_df['x_coor'][k], nodes_df['y_coor'][k]]
+                # speed = 1-(weight of bag/max bag weight)
+                speed = 1 - (bag_weight / dict_constants['CAPACITY OF KNAPSACK'])
+                # if speed < min speed
+                if speed < dict_constants['MIN SPEED']:
+                    # speed = min speed
+                    speed = dict_constants['MIN SPEED']
+                # time = distance*(1/speed)
+                time += e_distance(point1, point2) * (1 / speed)
+
+                # for len(items at new node)
+                items_at_location = bag_locations[TSP[i + 1]]
+                for j in range(len(items_at_location)):
+                    # check if item taken
+                    if knapsack[items_at_location[j]] == 1:
+                        # if item taken
+                        # add item weight to weight of bag
+                        bag_weight += items_df['weight'][items_at_location[j]]
+                        # add item value to total value
+                        total_value += items_df['profit'][items_at_location[j]]
+
+            # else
+            else:
+                # find distance from node just visited to new node
+                j = TSP[i] - 1
+                point1 = [TSP[i], nodes_df['x_coor'][j], nodes_df['y_coor'][j]]
+                k = TSP[0] - 1
+                point2 = [TSP[k], nodes_df['x_coor'][k], nodes_df['y_coor'][k]]
+                # speed = 1-(weight of bag/max bag weight)
+                speed = 1 - (bag_weight / dict_constants['CAPACITY OF KNAPSACK'])
+                # if speed < min speed
+                if speed < dict_constants['MIN SPEED']:
+                    # speed = min speed
+                    speed = dict_constants['MIN SPEED']
+                # time = distance*(1/speed)
+                time += e_distance(point1, point2) * (1 / speed)
+
+        # return time, total value
+        return time, total_value
+
+    # fitness function(TSP, Knapsack)
+    def fitness_function(to_check):
+        # time, value = Travelling Thief(TSP,Knapsack)
+        total_time, profit = travelling_thief(to_check)
+        # f = time - value
+        f = total_time - profit
+        # return f
+        return f
+
+def e_distance(point_1, point_2):
+    distance = math.sqrt((point_2[1] - point_1[1]) ** 2 + (point_2[2] - point_1[2]) ** 2)
+    return distance
+
+def travelling_thief(check):
+    TSP = check[1]
+    #it is assumed TSP begins at node 1
+    #if not, please contact the person who provided the TSP!
+    #TSP = [1,x,y,...,a,b]
+    #len(TSP) = len(nodes_df)
+    knapsack = check[0]
+
+    bag_locations = [[]]
+
+    for i in range (int(dict_constants['DIMENSION'])):
+        bag_locations.append([])
+    #look through all bags
+    for i in range (len(items_df)):
+    #assign to position in array which node they are at
+        bag_locations[items_df['assigned_node'][i]].append(i)
+    #this will give a 2D array with an empty 1 index (node 1 has no items)
+    #also an empty 0 index (node 0 does not exist)
+
+    bag_weight = 0
+    total_value = 0
+    time = 0
+    #for len(TSP solution)
+    for i in range(len(TSP)):
+        #if current node is not last in TSP solution
+        if i < (len(TSP)-1):
+            #find distance from node just visited to new node
+            j = TSP[i]-1
+            point1 = [TSP[i],nodes_df['x_coor'][j],nodes_df['y_coor'][j]]
+            k = TSP[(i+1)]-1
+            point2 = [TSP[k],nodes_df['x_coor'][k],nodes_df['y_coor'][k]]
+            #speed = 1-(weight of bag/max bag weight)
+            speed = 1 - (bag_weight/dict_constants['CAPACITY OF KNAPSACK'])
+            #if speed < min speed
+            if speed < dict_constants['MIN SPEED']:
+                #speed = min speed
+                speed = dict_constants['MIN SPEED']
+            #time = distance*(1/speed)
+            time += e_distance(point1,point2)*(1/speed)
+
+            #for len(items at new node)
+            items_at_location = bag_locations[TSP[i+1]]
+            for j in range(len(items_at_location)):
+                #check if item taken
+                if knapsack[items_at_location[j]] == 1:
+                    #if item taken
+                    #add item weight to weight of bag
+                    bag_weight += items_df['weight'][items_at_location[j]]
+                    #add item value to total value
+                    total_value += items_df['profit'][items_at_location[j]]
+
+        #else
+        else:
+            #find distance from node just visited to new node
+            j = TSP[i]-1
+            point1 = [TSP[i],nodes_df['x_coor'][j],nodes_df['y_coor'][j]]
+            k = TSP[0]-1
+            point2 = [TSP[k],nodes_df['x_coor'][k],nodes_df['y_coor'][k]]
+            #speed = 1-(weight of bag/max bag weight)
+            speed = 1 - (bag_weight/dict_constants['CAPACITY OF KNAPSACK'])
+            #if speed < min speed
+            if speed < dict_constants['MIN SPEED']:
+                #speed = min speed
+                speed = dict_constants['MIN SPEED']
+            #time = distance*(1/speed)
+            time += e_distance(point1,point2)*(1/speed)
+
+    #return time, total value
+    return time, total_value
+
+#fitness function(TSP, Knapsack)
+def fitness_function(to_check):
+    #time, value = Travelling Thief(TSP,Knapsack)
+    total_time, profit = travelling_thief(to_check)
+
+    #print('TIME',round(total_time,2))
+    #print('Value',profit)
+    #f = time - value
+    f = total_time - profit
+
+    #print('FINAL FIT', f)
+    #return f
+    return f, total_time,profit
+
+
+def evaluate_fitness_initial_pop():
+    global initial_pop, fitnesess, detailed_fitnesess
+    fitnesess=[]
+    detailed_fitnesess=[]
+    #FITNESS2.fitness_calculation(initial_pop[0], nodes_df, items_df, dict_constants)
+    for p in initial_pop:
+        f, total_time, profit=fitness_function(p)
+        fitnesess.append(f)
+        detailed_fitnesess.append((total_time,profit))
+
 
 read_data(file_name)
 create_final_pop()
+
+evaluate_fitness_initial_pop()
+
+
+
+

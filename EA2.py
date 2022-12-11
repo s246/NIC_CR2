@@ -57,6 +57,8 @@ def read_data(file_name):
     #close file
     raw.close()
 
+    return dict_constants, nodes_df, items_df
+
 def generate_random_initial_population_knappsack(pop_size,dimension):
     global number_fitness_eval #set global var
 

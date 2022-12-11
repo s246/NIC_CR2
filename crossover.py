@@ -38,7 +38,11 @@ def crossover_tsp(parents, skip_crossover = False):
 
     return offsprings
 
-def crossover(parents):
+def crossover(parent1, parent2):
+    parents = []
+    parents.append(parent1)
+    parents.append(parent2)
+
     offsprings = parents.copy()
 
     # crossover knapsack
@@ -59,23 +63,24 @@ def crossover(parents):
     # offspring 2
     offsprings[1] = (offsprings_knapsack[1], offsprings_tsp[1])
 
-    return offsprings
+    return offsprings[0], offsprings[1]
 
 
 
 def main():
     #generating test values
-    parents = []
+    # parents = []
     parent1 = ([1,0,0,1,1,0,1,1], [1,2,3,4,5])
     parent2 = ([1,1,1,1,0,0,0,0], [1,5,4,3,2])
-    parents.append(parent1)
-    parents.append(parent2)
-    print('parents')
-    print(parents)
+    # parents.append(parent1)
+    # parents.append(parent2)
+    # print('parents')
+    # print(parents)
 
-    offsprings = crossover(parents)
+    offspring1, offspring2 = crossover(parent1, parent2)
     print('offsprings')
-    print(offsprings)
+    print(offspring1)
+    print(offspring2)
 
 
 if __name__ == "__main__":

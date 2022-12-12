@@ -33,20 +33,25 @@ def save_to_file(file_name, detailed_fitnesess, population):
 def plot_time_vs_profit(file_name, generattion):
     file_name_without_ext = os.path.splitext('{}'.format(file_name))[0]
     resultfilename_fitness = 'Results/{}/fitness_evals.txt'.format(file_name_without_ext)
-    # plt.figure()
+
     df = pd.read_csv(resultfilename_fitness, sep=" ", header=None)
-    # df_pareto = pd.DataFrame()
+    pareto_list = []
 
-    # for i in df:
-    #     is_
-    #     for j in df:
+    for i, row_i in df.iterrows():
+        is_dominant = True
+        for j, row_j in df.iterrows():
+            if i != j:
+                if df.loc[j][0] < df.loc[i][0] and df.loc[j][1] > df.loc[i][1]:
+                    is_dominant = False
+        
+        if is_dominant == True:
+            pareto_list.append(row_i)
 
+    df_pareto = pd.DataFrame(pareto_list, columns=[0,1])
+    df_pareto[1] = df_pareto[1]*(-1)
 
-
-    df[1] = df[1]*(-1)
-    plt.scatter(df[0], df[1], s = 5, label = generattion)
+    plt.scatter(df_pareto[0], df_pareto[1], s = 5, label = generattion)
     plt.title(resultfilename_fitness.split('/')[1])
     plt.xlabel('time')
     plt.ylabel('profit')
     plt.legend()
-    # plt.show()

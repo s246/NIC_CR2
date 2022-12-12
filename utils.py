@@ -52,6 +52,6 @@ def plot_time_vs_profit(file_name, generattion):
 
     plt.scatter(df_pareto[0], df_pareto[1], s = 5, label = generattion)
     plt.title(resultfilename_fitness.split('/')[1])
-    plt.xlabel('time')
-    plt.ylabel('profit')
+    plt.xlabel('Time')
+    plt.ylabel('Negative of profit')
     plt.legend()

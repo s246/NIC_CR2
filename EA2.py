@@ -5,10 +5,12 @@ import numpy as np
 import pandas as pd
 import math
 import random
-import os
+from utils import plot_time_vs_profit, save_to_file
+import matplotlib.pyplot as plt
 
 
-file_name='a280-n1395.txt'
+
+file_name='a280-n279.txt'
 
 #global vars
 #constanst of current problem
@@ -30,7 +32,7 @@ global detailed_fitnesess
 global number_fitness_eval
 
 
-pop_size=20
+pop_size=100
 tournament_size=4
 mutation_rate=2
 SEED=4
@@ -43,7 +45,7 @@ def read_data(file_name):
     dict_constants={}
 
     #read txt file on absolute path
-    with open(f"/home/sebastian/Documents/EXETER/Nature_inspired_computation/pyprojects/Coursework2/gecco19-thief-master/src/main/resources/{file_name}") as raw:
+    with open(file_name) as raw:
         data = raw.read()
         nodes_pos=data.split('ITEMS SECTION')[0]
         items_vals = data.split('ITEMS SECTION')[1]
@@ -462,7 +464,11 @@ def main():
     generation=0
 
     #do while fitness evals <10000
-    while number_fitness_eval<10000:
+
+    ##########
+    plt.figure()
+    ##########
+    while number_fitness_eval<20000:
 
         #select parent a from tournament
         parent_a = perform_tournament_selection(tournament_size, population, fitnesess)
@@ -509,7 +515,15 @@ def main():
             print('*********************************')
             print()
 
+            save_to_file(file_name, detailed_fitnesess, population)
+            plot_time_vs_profit(file_name, generation)
+
         generation = generation + 1
+    
+    ##########
+    print("gen before plot", generation)
+    plt.show()
+    ##########
 
     #FIND BEST SOL
     best_sol_index=np.argmin(fitnesess)
@@ -530,29 +544,6 @@ def main():
     print(Hypervolume(file_name,[[t[0],t[1]] for t in detailed_fitnesess]))
     print('***********************')
     
-    # Printing fitness for last gen
-    file_name_without_ext = os.path.splitext('{}'.format(file_name))[0]
-    resultfilename_fitness = 'Results/{}/fitness_evals.txt'.format(file_name_without_ext)
-    os.makedirs(os.path.dirname(resultfilename_fitness), exist_ok=True)
-
-    with open(resultfilename_fitness, 'w') as f:
-        for fitness in detailed_fitnesess:
-            f.writelines("{} {}\n".format(fitness[1], fitness[0]))
-
-    # Printing population for last gen
-    resultfilename_pop = 'Results/{}/pop.txt'.format(file_name_without_ext)
-    os.makedirs(os.path.dirname(resultfilename_pop), exist_ok=True)
-
-    with open(resultfilename_pop, 'w') as f:
-        for pop in population:
-            for p in pop[1]:
-                f.writelines("{} ".format(p))
-            f.writelines("\n")
-            for p in pop[0]:
-                f.writelines("{} ".format(p))
-            f.writelines("\n\n")
-    
-
     #return w,v,fitnesses[best_sol_index],np.average(fitnesses),list(s.keys())
 
 

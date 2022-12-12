@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import math
 import random
+import os
 
 
 file_name='a280-n1395.txt'
@@ -528,6 +529,29 @@ def main():
     print('HYPER VOLUME')
     print(Hypervolume(file_name,[[t[0],t[1]] for t in detailed_fitnesess]))
     print('***********************')
+    
+    # Printing fitness for last gen
+    file_name_without_ext = os.path.splitext('{}'.format(file_name))[0]
+    resultfilename_fitness = 'Results/{}/fitness_evals.txt'.format(file_name_without_ext)
+    os.makedirs(os.path.dirname(resultfilename_fitness), exist_ok=True)
+
+    with open(resultfilename_fitness, 'w') as f:
+        for fitness in detailed_fitnesess:
+            f.writelines("{} {}\n".format(fitness[1], fitness[0]))
+
+    # Printing population for last gen
+    resultfilename_pop = 'Results/{}/pop.txt'.format(file_name_without_ext)
+    os.makedirs(os.path.dirname(resultfilename_pop), exist_ok=True)
+
+    with open(resultfilename_pop, 'w') as f:
+        for pop in population:
+            for p in pop[1]:
+                f.writelines("{} ".format(p))
+            f.writelines("\n")
+            for p in pop[0]:
+                f.writelines("{} ".format(p))
+            f.writelines("\n\n")
+    
 
     #return w,v,fitnesses[best_sol_index],np.average(fitnesses),list(s.keys())
 

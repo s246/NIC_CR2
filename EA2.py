@@ -521,9 +521,10 @@ def main():
         generation = generation + 1
     
     ##########
-    print("gen before plot", generation)
-    plt.show()
+    plt.savefig('{}.png'.format(file_name))
     ##########
+
+    save_to_file(file_name, detailed_fitnesess, population)
 
     #FIND BEST SOL
     best_sol_index=np.argmin(fitnesess)

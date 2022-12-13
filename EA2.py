@@ -5,8 +5,9 @@ import numpy as np
 import pandas as pd
 import math
 import random
-from utils import plot_time_vs_profit, save_to_file
+from utils import plot_time_vs_profit, save_to_file, eucledian_distance
 import matplotlib.pyplot as plt
+from TSPGreedy import findMinRoute
 
 
 
@@ -32,7 +33,7 @@ global detailed_fitnesess
 global number_fitness_eval
 
 
-pop_size=100
+pop_size=20
 tournament_size=4
 mutation_rate=2
 SEED=4
@@ -102,9 +103,10 @@ def generate_random_initial_population_knappsack(pop_size,dimension):
     #use numpy random int between 0-1 to create solutions with size of number of bags [0,1,0,0,1.....] to 100
     for i in range(0, pop_size):
         actual_sol=np.array([int(t) for t in np.zeros(dimension)])
-        # indx=np.random.choice(range(0, len(actual_sol)), 15, replace=False)
-        # for i in indx:
-        #     actual_sol[i]=1
+        counts = math.ceil((0.05 * dimension))
+        indx=np.random.choice(range(0, len(actual_sol)), counts, replace=False)
+        for i in indx:
+            actual_sol[i]=1
         population.append(actual_sol)
 
     return population
@@ -113,10 +115,17 @@ def generate_random_initial_population_TSP(pop_size,number_nodes, max_nodes):
 
     population = []
     #use numpy random solutions with size of number of nodes [1,2,3,280.....] to number of nodes
+
+    nodes = nodes_df.values.tolist()
+    fetch_dist_matrix = eucledian_distance(nodes)
+    sum, route = findMinRoute(fetch_dist_matrix)
+    # print(route)
+
     for i in range(0, pop_size):
-        actual_sol = np.random.choice(range(2,int(number_nodes)+1), int(max_nodes-1), replace=False)
-        actual_sol=np.insert(actual_sol, 0, 1)
-        population.append(actual_sol)
+        # actual_sol = np.random.choice(range(2,int(number_nodes)+1), int(max_nodes-1), replace=False)
+        # actual_sol=np.insert(actual_sol, 0, 1)
+        # population.append(actual_sol)
+        population.append(route)
 
     return population
 
@@ -435,8 +444,8 @@ def main():
     number_fitness_eval=0
 
     #SET SEED FOR REPLICATION PURPOSES
-    np.random.seed(SEED)
-    random.seed(SEED)
+    # np.random.seed(SEED)
+    # random.seed(SEED)
 
     #read bag data from file #detailed comments on function
     read_data(file_name)
@@ -468,7 +477,7 @@ def main():
     ##########
     plt.figure()
     ##########
-    while number_fitness_eval<20000:
+    while number_fitness_eval<10000:
 
         #select parent a from tournament
         parent_a = perform_tournament_selection(tournament_size, population, fitnesess)
@@ -515,16 +524,17 @@ def main():
             print('*********************************')
             print()
 
-            save_to_file(file_name, detailed_fitnesess, population)
-            plot_time_vs_profit(file_name, generation)
+            if(generation % 5000) == 0:
+                save_to_file(file_name, detailed_fitnesess, population)
+                plot_time_vs_profit(file_name, generation)
 
         generation = generation + 1
     
+    save_to_file(file_name, detailed_fitnesess, population)
     ##########
+    #plot_time_vs_profit(file_name, generation)
     plt.savefig('{}.png'.format(file_name))
     ##########
-
-    save_to_file(file_name, detailed_fitnesess, population)
 
     #FIND BEST SOL
     best_sol_index=np.argmin(fitnesess)
@@ -541,11 +551,11 @@ def main():
     print(best_time_value)
 
 
-    print('HYPER VOLUME')
-    print(Hypervolume(file_name,[[t[0],t[1]] for t in detailed_fitnesess]))
-    print('***********************')
+    # print('HYPER VOLUME')
+    # print(Hypervolume(file_name,[[t[0],t[1]] for t in detailed_fitnesess]))
+    # print('***********************')
     
-    #return w,v,fitnesses[best_sol_index],np.average(fitnesses),list(s.keys())
+    # return w,v,fitnesses[best_sol_index],np.average(fitnesses),list(s.keys())
 
 
 

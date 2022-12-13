@@ -351,31 +351,28 @@ def crossover(parent1, parent2):
     offsprings[1] = (offsprings_knapsack[1], offsprings_tsp[1])
 
     return offsprings[0], offsprings[1]
+
 def mutation(child1, child2, rate):
     a1, a2 = child1, child2
     bag_dis_1, city_route_1, bag_dis_2, city_route_2 = a1[0].copy(), a1[1].copy(), a2[0].copy(), a2[1].copy()
+    # mutation rate for the bag distribution
     mutation_rate_1 = math.ceil((rate / 100) * len(bag_dis_1))
+    # mutation rate for the route selection
     mutation_rate_2 = math.ceil((rate / 100) * len(city_route_1))
-    #print(mutation_rate_2)
-    #print(mutation_rate_1)
 
     for i in range(mutation_rate_1):
-        mutation_point_bag_1 = random.randint(0, len(bag_dis_1) - 1)  # bag selection mutation
-        #print(mutation_point_bag_1)
+        mutation_point_bag_1 = random.randint(0, len(bag_dis_1) - 1)  # generating bag distribution mutation points for child1
         bag_dis_1[mutation_point_bag_1] = random.randint(0, 1)
 
-        mutation_point_bag_2 = random.randint(0, len(bag_dis_2) - 1)  # bag selection mutation
-        #print(mutation_point_bag_2)
+        mutation_point_bag_2 = random.randint(0, len(bag_dis_2) - 1)  # generating bag distribution mutation points for child1
         bag_dis_2[mutation_point_bag_2] = random.randint(0, 1)
 
     for j in range(mutation_rate_2):
-        rand_1 = random.sample(range(1, len(city_route_1) - 1),
-                               2)  # random values to generate the indexes of the route to be swapped
-        city_route_1[rand_1[0]], city_route_1[rand_1[1]] = city_route_1[rand_1[1]], city_route_1[rand_1[0]]
+        rand_1 = random.sample(range(1, len(city_route_1) - 1),2)  # random values to generate the indexes of the route to be swapped
+        city_route_1[rand_1[0]], city_route_1[rand_1[1]] = city_route_1[rand_1[1]], city_route_1[rand_1[0]] # swapping elements in the indexes
 
-        rand_2 = random.sample(range(1, len(city_route_2) - 1),
-                               2)  # random values to generate the indexes of the route to be swapped
-        city_route_2[rand_2[0]], city_route_2[rand_2[1]] = city_route_2[rand_2[1]], city_route_2[rand_2[0]]
+        rand_2 = random.sample(range(1, len(city_route_2) - 1),2)  # random values to generate the indexes of the route to be swapped
+        city_route_2[rand_2[0]], city_route_2[rand_2[1]] = city_route_2[rand_2[1]], city_route_2[rand_2[0]] # swapping elements in the indexes
 
     return (bag_dis_1, city_route_1), (bag_dis_2, city_route_2)
 

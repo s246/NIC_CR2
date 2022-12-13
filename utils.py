@@ -4,6 +4,9 @@ import random as rd
 from random import randint
 import matplotlib.pyplot as plt
 import os
+import math
+import itertools
+
 
 
 def save_to_file(file_name, detailed_fitnesess, population): 
@@ -50,8 +53,39 @@ def plot_time_vs_profit(file_name, generattion):
     df_pareto = pd.DataFrame(pareto_list, columns=[0,1])
     df_pareto[1] = df_pareto[1]*(-1)
 
-    plt.scatter(df_pareto[0], df_pareto[1], s = 5, label = generattion)
+    plt.scatter(df_pareto[0], df_pareto[1], s = 5, label = "{} gen".format(generattion))
     plt.title(resultfilename_fitness.split('/')[1])
     plt.xlabel('Time')
     plt.ylabel('Negative of profit')
     plt.legend()
+
+def calculate_distance(point_1,point_2):
+    distance = math.sqrt((point_2[1] - point_1[1])**2 + (point_2[2] - point_1[2])**2)
+    return distance 
+
+def eucledian_distance(nodes_list):
+    main_list = [] 
+    b = list(itertools.permutations(nodes_list,2))
+    for i in b:
+        elements_list = []
+        point1 = i[0]
+        point2 = i[1]
+        distance = calculate_distance(point1, point2)
+        elements_list.extend((int(point1[0]),int(point2[0]),distance))
+        main_list.append(elements_list)
+
+    for i in range(1,int(nodes_list[-1][0])+1):
+        lst_1 = []
+        lst_1.extend((int(i),int(i),float(0)))
+        main_list.append(lst_1)
+
+    df = pd.DataFrame(main_list, columns=['Source','Destination','Distance'])
+    df = df.sort_values(by=['Source','Destination']).reset_index(drop=True)
+
+    distance_list = df['Distance'].tolist()
+    x = np.array(distance_list)
+    shape = (len(nodes_list),len(nodes_list)) 
+    distance_matrix = x.reshape(shape)
+    
+    return distance_matrix
+
